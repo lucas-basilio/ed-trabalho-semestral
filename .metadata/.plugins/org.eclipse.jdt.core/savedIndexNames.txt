@@ -1,0 +1,4 @@
+INDEX VERSION 1.134+C:\Users\lukal\OneDrive\Desktop\br.edu.fateczl.trabalho-semestral\.metadata\.plugins\org.eclipse.jdt.core
+1865797976.index
+2215256467.index
+1067094681.index

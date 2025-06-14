@@ -1,0 +1,91 @@
+package view;
+
+import controller.professor.ProfessorController;
+
+import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+
+public class ProfessorView extends JFrame {
+
+	private static final long serialVersionUID = 1L;
+	private JPanel contentPane;
+	private JTable tableProfessor;
+
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					ProfessorView frame = new ProfessorView();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public ProfessorView() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 939, 575);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+		
+		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.setBounds(46, 36, 824, 489);
+		contentPane.add(tabbedPane);
+		
+		JPanel professorTab = new JPanel();
+		tabbedPane.addTab("Professores", null, professorTab, null);
+		professorTab.setLayout(null);
+		//professorTab.add(populateProfessores());
+		
+		JButton btnNewButton = new JButton("Listar Professores");
+		btnNewButton.setBounds(48, 11, 119, 35);
+
+		btnNewButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				var pop = populateProfessores();
+
+
+			}
+		});
+		tableProfessor = new JTable(new DefaultTableModel(new Object[][]{}, new ProfessorController().getFields()));
+		professorTab.add(btnNewButton);
+		
+		JPanel disciplinaTab = new JPanel();
+		tabbedPane.addTab("Disciplinas", null, disciplinaTab, null);
+	}
+
+	private JScrollPane populateProfessores()
+	{
+		ProfessorController prCtrl = new ProfessorController();
+		Object[][] data = new Object[][]{};
+
+		try
+		{
+			data = prCtrl.get();
+		}
+		catch (Exception ex)
+		{
+
+		}
+
+		tableProfessor = new JTable(new DefaultTableModel(data, prCtrl.getFields()));
+		tableProfessor.setBounds(30, 57, 760, 361);
+		var painelProfessor = new JScrollPane(tableProfessor);
+		painelProfessor.setBounds(30, 57, 760, 361);
+		return painelProfessor;
+	}
+}

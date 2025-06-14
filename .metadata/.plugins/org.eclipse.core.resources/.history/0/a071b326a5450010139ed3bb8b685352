@@ -1,0 +1,36 @@
+package view.cursoView;
+
+import controller.curso.CursoController;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
+
+public class CursoView extends JPanel {
+
+	private static final long serialVersionUID = 1L;
+	private JTextField textField;
+	private JTextField textField_1;
+
+	/**
+	 * Create the panel.
+	 */
+	public CursoView() {
+		setLayout(null);
+		
+		textField_1 = new JTextField();
+		textField_1.setBounds(38, 64, 86, 20);
+		add(textField_1);
+		textField_1.setColumns(10);
+		
+		JLabel lblNewLabel = new JLabel("New label");
+		lblNewLabel.setBounds(57, 39, 46, 14);
+		add(lblNewLabel);
+		
+		JButton btnNewButton = new JButton("Salvar");
+		btnNewButton.setBounds(84, 121, 89, 23);
+		add(btnNewButton);
+
+
+	}
+}

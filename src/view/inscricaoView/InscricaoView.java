@@ -207,6 +207,10 @@ public class InscricaoView extends JPanel {
 		clearPanel();
 
 		if (!edit) {
+			if (codProcesso == null)
+			{
+				codProcesso = new JComboBox<>();
+			}
 			codProcesso.setSelectedItem(0);
 			cpfProfessor.setSelectedItem(0);
 			try

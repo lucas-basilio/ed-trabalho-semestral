@@ -1,0 +1,13 @@
+package view.disciplinaView;
+
+import javax.swing.JPanel;
+
+public class DisciplinaViEW extends JPanel {
+
+	private static final long serialVersionUID = 1L;
+
+	public DisciplinaViEW() {
+
+	}
+
+}

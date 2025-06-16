@@ -1,7 +1,5 @@
 package controller.disciplina;
 
-import model.dataStructures.Fila;
-import model.dataStructures.HashTable;
 import model.disciplina.Disciplina;
 import model.disciplina.DisciplinaModel;
 
@@ -14,6 +12,16 @@ public class DisciplinaController {
         return this.disciplinaModel.populateTable();
     }
 
+    public String[] getFields()
+    {
+        return this.disciplinaModel.getFields();
+    }
+
+    public Integer[] getCodCursos() throws Exception
+    {
+        return this.disciplinaModel.getCodCursos();
+    }
+
     //public HashTable<Disciplina>
 
     public Disciplina getByCod(int cod) throws Exception
@@ -23,7 +31,7 @@ public class DisciplinaController {
 
     public void post(Disciplina disciplina) throws Exception
     {
-        this.disciplinaModel.postDisciplina(disciplina.toCSV());
+        this.disciplinaModel.postDisciplina(disciplina.toString());
     }
 
     public void put(Disciplina disciplina) throws Exception
@@ -31,8 +39,13 @@ public class DisciplinaController {
         this.disciplinaModel.putDisciplina(disciplina);
     }
 
-    public void delete(Disciplina disciplina) throws Exception
+    public void delete(int cod) throws Exception
     {
-        this.disciplinaModel.deleteDisciplina(disciplina);
+        this.disciplinaModel.deleteDisciplina(cod);
+    }
+
+    public int count()
+    {
+        return this.disciplinaModel.count();
     }
 }

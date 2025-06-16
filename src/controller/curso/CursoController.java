@@ -2,7 +2,6 @@ package controller.curso;
 
 import model.curso.Curso;
 import model.curso.CursoModel;
-import model.dataStructures.Fila;
 
 public class CursoController {
     private final CursoModel cursoModel = new CursoModel();
@@ -12,6 +11,11 @@ public class CursoController {
         return this.cursoModel.populateTable();
     }
 
+    public String[] getFields()
+    {
+        return new Curso().properties();
+    }
+
     public Curso getByCpf(int cod) throws Exception
     {
         return this.cursoModel.getCursoByCod(cod);
@@ -19,7 +23,7 @@ public class CursoController {
 
     public void post(Curso curso) throws Exception
     {
-        this.cursoModel.postCurso(curso.toCSV());
+        this.cursoModel.postCurso(curso.toString());
     }
 
     public void put(Curso curso) throws Exception
@@ -27,8 +31,8 @@ public class CursoController {
         this.cursoModel.putCurso(curso);
     }
 
-    public void delete(Curso curso) throws Exception
+    public void delete(int codCurso) throws Exception
     {
-        this.cursoModel.deleteCurso(curso);
+        this.cursoModel.deleteCurso(codCurso);
     }
 }

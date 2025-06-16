@@ -1,0 +1,307 @@
+package view.professorView;
+
+import controller.professor.ProfessorController;
+import model.professor.Professor;
+import view.components.PopupView;
+import view.components.TableButtonView;
+
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.text.NumberFormat;
+
+public class ProfessorView extends JPanel {
+
+	private static final long serialVersionUID = 1L;
+
+	private ProfessorController professorController;
+
+	private JButton btnListarProfessores;
+	private JButton btnCadastraProfessor;
+
+	private JFormattedTextField nomeProfessor;
+	private JFormattedTextField cpfProfessor;
+	private JFormattedTextField areaProfessor;
+	private JFormattedTextField pontosProfessor;
+
+	private String editCpf;
+
+	private PopupView popupView;
+	private JPanel parentData;
+
+	private JLabel labelMessage;
+
+	public ProfessorView() {
+		professorController = new ProfessorController();
+		popupView = new PopupView();
+		this.setLayout(null);
+
+		btnListarProfessores = new JButton("Listar Professores");
+		btnListarProfessores.setBounds(48, 11, 119, 35);
+
+		btnCadastraProfessor = new JButton("Cadastrar Professor");
+		btnCadastraProfessor.setBounds(202, 11, 134, 35);
+
+		labelMessage = new JLabel();
+		labelMessage.setSize(220, 35);
+		labelMessage.setVisible(false);
+
+		nomeProfessor = new JFormattedTextField();
+		cpfProfessor = new JFormattedTextField();
+		areaProfessor = new JFormattedTextField();
+		pontosProfessor = new JFormattedTextField(NumberFormat.getNumberInstance());
+
+		btnListarProfessores.addActionListener(e -> {
+			clearLayout();
+
+			try
+			{
+				populateProfessores();
+			}
+			catch (Exception ex)
+			{
+				showMessage(ex.getMessage());
+			}
+		});
+
+		btnCadastraProfessor.addActionListener(e -> professorForm(false));
+
+		this.add(btnListarProfessores);
+		this.add(btnCadastraProfessor);
+
+		try
+		{
+			populateProfessores();
+		}
+		catch (Exception ex)
+		{
+			showMessage(ex.getMessage());
+		}
+	}
+
+	//Cria e popula a listagem de professores
+	private void populateProfessores() throws Exception
+	{
+		clearLayout();
+
+		Object[][] data = professorController.get();
+
+		DefaultTableModel tableModel = new DefaultTableModel(data, professorController.getFields());
+		tableModel.addColumn("Editar");
+		tableModel.addColumn("Excluir");
+
+		JTable tableProfessor = new JTable(tableModel);
+
+		//Força a reconhecer os campos novos
+		tableProfessor.setModel(tableModel);
+
+		tableProfessor.getColumn("Editar").setCellRenderer(new TableButtonView("Editar"));
+		tableProfessor.getColumn("Excluir").setCellRenderer(new TableButtonView("Excluir"));
+
+		tableProfessor.setBounds(30, 57, 760, 361);
+
+		tableProfessor.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int row = tableProfessor.rowAtPoint(e.getPoint());
+				int column = tableProfessor.columnAtPoint(e.getPoint());
+
+				if ((row >= 0 && column >= 0)) {
+					if (column == 4)
+					{
+						nomeProfessor.setText((String) tableProfessor.getValueAt(row, 0));
+						cpfProfessor.setText((String) tableProfessor.getValueAt(row, 1));
+						areaProfessor.setText((String) tableProfessor.getValueAt(row, 2));
+						pontosProfessor.setText(Double.toString((double)tableProfessor.getValueAt(row, 3)));
+
+						professorForm(true);
+					}
+					else if (column == 5)
+					{
+						try
+						{
+							professorController.delete((String) tableProfessor.getValueAt(row, 1));
+							popupView.showPopup(parentData, "Professor excluido com sucesso", "Sucesso");
+							populateProfessores();
+						}
+						catch (Exception ex)
+						{
+							clearLayout();
+							showMessage(ex.getMessage());
+						}
+					}
+				}
+			}
+		});
+
+		JScrollPane tableProfessorScroll = new JScrollPane(tableProfessor);
+		tableProfessorScroll.setBounds(30, 57, 760, 361);
+		this.add(tableProfessorScroll);
+	}
+
+	//Cria a aba de Cadastro de Professor
+	private void professorForm(boolean edit)
+	{
+		clearLayout();
+
+		if (!edit)
+		{
+			nomeProfessor.setText("");
+			cpfProfessor.setText("");
+			areaProfessor.setText("");
+			pontosProfessor.setText("");
+		}
+		else
+		{
+			editCpf = cpfProfessor.getText();
+		}
+
+		int width = 300;
+		int height = 25;
+		int x = 100;
+
+		JLabel labelNome = new JLabel("Nome do professor:");
+		labelNome.setBounds(x, 70, width, height);
+		nomeProfessor.setBounds(x, 100, width, height);
+
+		JLabel labelCpf = new JLabel("CPF do professor:");
+		labelCpf.setBounds(x, nomeProfessor.getY() + 60, width, height);
+		cpfProfessor.setBounds(x, nomeProfessor.getY() + 90, width, height);
+
+		JLabel labelArea = new JLabel("Área de atuação do professor:");
+		labelArea.setBounds(x, cpfProfessor.getY() + 60, width, height);
+		areaProfessor.setBounds(x, cpfProfessor.getY() + 90, width, height);
+
+		JLabel labelPontos = new JLabel("Pontos do professor:");
+		labelPontos.setBounds(x, areaProfessor.getY() + 60, width, height);
+		pontosProfessor.setBounds(x, areaProfessor.getY() + 90, width, height);
+
+		JButton submitProfessor = new JButton("Cadastrar Professor");
+		submitProfessor.setBounds(x, pontosProfessor.getY() + 40, 160, height + 10);
+
+		submitProfessor.addActionListener(e -> {
+			try
+			{
+				submitProfessor(edit);
+			}
+			catch (Exception ex)
+			{
+
+			}
+		});
+
+		this.add(labelNome);
+		this.add(labelCpf);
+		this.add(labelArea);
+		this.add(labelPontos);
+
+		this.add(nomeProfessor);
+		this.add(cpfProfessor);
+		this.add(areaProfessor);
+		this.add(pontosProfessor);
+
+		this.add(submitProfessor);
+
+		this.updateUI();
+	}
+
+	public void submitProfessor(boolean edit) throws Exception
+	{
+		Professor professor = new Professor();
+		Border borderLineError = BorderFactory.createLineBorder(Color.RED, 3);
+		Border borderLine = new JTextField().getBorder();
+		boolean error = false;
+
+		nomeProfessor.setBorder(borderLine);
+		cpfProfessor.setBorder(borderLine);
+		areaProfessor.setBorder(borderLine);
+		pontosProfessor.setBorder(borderLine);
+
+		if (this.nomeProfessor.getText().trim().isEmpty())
+		{
+			this.nomeProfessor.setBorder(borderLineError);
+			error = true;
+		}
+
+		if (this.cpfProfessor.getText().trim().isEmpty())
+		{
+			this.cpfProfessor.setBorder(borderLineError);
+			error = true;
+		}
+
+		if (this.areaProfessor.getText().trim().isEmpty())
+		{
+			this.areaProfessor.setBorder(borderLineError);
+			error = true;
+		}
+
+		if (this.pontosProfessor.getText().trim().isEmpty())
+		{
+			this.pontosProfessor.setBorder(borderLineError);
+			error = true;
+		}
+
+		if (error)
+		{
+			popupView.showPopup(parentData, "Preencha os campos corretamente", "Falha");
+			return;
+		}
+
+		professor.setNome(this.nomeProfessor.getText().trim());
+		professor.setCpf(this.cpfProfessor.getText().trim());
+		professor.setArea(this.areaProfessor.getText().trim());
+		professor.setPontos(Double.parseDouble(this.pontosProfessor.getText().trim()));
+
+		if (!edit)
+		{
+			professorController.post(professor);
+		}
+		else
+		{
+			professorController.put(professor, editCpf);
+		}
+
+		popupView.showPopup(parentData, edit ? "Professor editado com sucesso." : "Professor criado com sucesso", "Sucesso");
+
+		nomeProfessor.setText("");
+		cpfProfessor.setText("");
+		areaProfessor.setText("");
+		pontosProfessor.setText("");
+
+		populateProfessores();
+	}
+
+	//Para setar o painel pai, apesar de ser o this
+	public void applyPopup(JPanel parent)
+	{
+		this.parentData = parent;
+	}
+
+	public void showMessage(String message) {
+		clearLayout();
+		labelMessage.setText(message);
+
+		// Centraliza no painel atual
+		int x = (getWidth() - labelMessage.getWidth()) / 2;
+		int y = (getHeight() - labelMessage.getHeight()) / 2;
+		labelMessage.setLocation(x, y);
+
+		labelMessage.setVisible(true);
+		repaint();
+		updateUI();
+	}
+
+	public void clearLayout()
+	{
+		this.removeAll();
+		this.setLayout(null);
+
+		this.add(btnListarProfessores);
+		this.add(btnCadastraProfessor);
+
+		this.updateUI();
+	}
+}

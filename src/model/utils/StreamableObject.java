@@ -6,7 +6,7 @@ public class StreamableObject {
     private final Field[] fields = this.getClass().getDeclaredFields();
 
     //Um jeito de pegar todas os valores das propriedades de uma classe
-    public String toCSV()
+    public String toString()
     {
         StringBuffer str = new StringBuffer();
 

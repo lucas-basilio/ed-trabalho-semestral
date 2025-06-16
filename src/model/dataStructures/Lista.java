@@ -2,12 +2,10 @@ package model.dataStructures;
 
 public class Lista<T> {
     public No primeiro;
-    private int size;
 
     public Lista ()
     {
         this.primeiro = null;
-        this.size = 0;
     }
 
     public No get(int index) throws Exception
@@ -17,7 +15,7 @@ public class Lista<T> {
             throw new Exception("Lista vazia.");
         }
 
-        if (index < 0 || index > size)
+        if (index < 0 || index > this.size())
         {
             throw new Exception("Posição inválida");
         }
@@ -41,7 +39,6 @@ public class Lista<T> {
         newNo.dado = valor;
         newNo.proximo = this.primeiro;
         this.primeiro = newNo;
-        this.size++;
     }
 
     public void addLast(T valor) throws Exception
@@ -56,14 +53,13 @@ public class Lista<T> {
         newNo.dado = valor;
         newNo.proximo = null;
 
-        No ultimo = get(size - 1);
+        No ultimo = get(this.size() - 1);
         ultimo.proximo = newNo;
-        this.size++;
     }
 
     public void add(T value, int index) throws Exception
     {
-        if (index > this.size || index < 0)
+        if (index > this.size() || index < 0)
         {
             throw new Exception("Posição inválida.");
         }
@@ -72,7 +68,7 @@ public class Lista<T> {
         {
             addFirst(value);
         }
-        else if (index == this.size)
+        else if (index == this.size())
         {
             addLast(value);
         }
@@ -85,7 +81,6 @@ public class Lista<T> {
 
             newNo.proximo = anterior.proximo;
             anterior.proximo = newNo;
-            this.size++;
         }
     }
     //endregion
@@ -99,7 +94,6 @@ public class Lista<T> {
         }
 
         this.primeiro = this.primeiro.proximo;
-        this.size--;
     }
 
     public void removeLast() throws Exception
@@ -109,15 +103,14 @@ public class Lista<T> {
             throw new Exception("Lista vazia.");
         }
 
-        if (this.size == 1)
+        if (this.size() == 1)
         {
             removeFirst();
             return;
         }
 
-        No penultimo = get(this.size - 2);
+        No penultimo = get(this.size() - 2);
         penultimo.proximo = null;
-        this.size--;
     }
 
     public void remove(int index) throws Exception
@@ -127,7 +120,7 @@ public class Lista<T> {
             throw new Exception("Lista vazia.");
         }
 
-        if (index < 0 || index > this.size - 1)
+        if (index < 0 || index > this.size() - 1)
         {
             throw new Exception("Posição inválida.");
         }
@@ -136,7 +129,7 @@ public class Lista<T> {
         {
             removeFirst();
         }
-        else if (index == this.size - 1)
+        else if (index == this.size() - 1)
         {
             removeLast();
         }
@@ -158,7 +151,20 @@ public class Lista<T> {
 
     public int size()
     {
-        return this.size;
+        int count = 0;
+
+        if (!isEmpty())
+        {
+            No temp = this.primeiro;
+
+            while (temp != null)
+            {
+                count++;
+                temp = temp.proximo;
+            }
+        }
+
+        return count;
     }
 
     @Override

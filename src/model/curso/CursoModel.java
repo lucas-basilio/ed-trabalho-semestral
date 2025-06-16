@@ -3,6 +3,7 @@ package model.curso;
 import model.dataStructures.Fila;
 import model.dataStructures.Lista;
 import model.disciplina.Disciplina;
+import model.inscricao.Inscricao;
 import model.professor.Professor;
 import model.utils.FileManager;
 
@@ -11,10 +12,17 @@ public class CursoModel {
     private final FileManager manager = new FileManager("src/data/cursos.csv");
 
     //region Usar filas no GET e POST
-    private Fila<Curso> getCursos() throws Exception
+    public Fila<Curso> getCursos() throws Exception
     {
-        String[] values = this.manager.readFileToString().split(",");
         Fila<Curso> cursos = new Fila<>();
+        String result = this.manager.readFileToString();
+
+        if (result.isBlank())
+        {
+            throw new Exception("Não há cursos cadastrados");
+        }
+
+        String[] values = result.split(",");
 
         for (int x = 0; x < values.length; x += 3)
         {
@@ -47,6 +55,21 @@ public class CursoModel {
         }
 
         return dados;
+    }
+
+    public Integer[] getCodCursos() throws Exception
+    {
+        Fila<Curso> cursos = getCursos();
+        int size = cursos.size();
+        Integer[] values = new Integer[size];
+
+        for (int x = 0; x < size; x++)
+        {
+            Curso temp = cursos.remove();
+            values[x] = temp.getCodCurso();
+        }
+
+        return values;
     }
 
     public Curso getCursoByCod(int codigo) throws Exception
@@ -90,6 +113,8 @@ public class CursoModel {
             if (temp.getCodCurso() == curso.getCodCurso())
             {
                 cursos.add(curso, x);
+                cursos.remove(x + 1);
+                break;
             }
         }
 
@@ -104,7 +129,7 @@ public class CursoModel {
         this.manager.writeIntoFile(str.toString(), false);
     }
 
-    public void deleteCurso(Curso curso) throws Exception
+    public void deleteCurso(int cod) throws Exception
     {
         Fila<Curso> filaCursos = getCursos();
         Lista<Curso> cursos = new Lista<>();
@@ -118,7 +143,7 @@ public class CursoModel {
         {
             Curso temp = (Curso)cursos.get(x).dado;
 
-            if (temp.equals(curso))
+            if (temp.getCodCurso() == cod)
             {
                 cursos.remove(x);
             }
@@ -135,4 +160,37 @@ public class CursoModel {
         this.manager.writeIntoFile(str.toString(), false);
     }
     //endregion
+
+    public int count()
+    {
+        try
+        {
+            var values = getCursos();
+            return values.size();
+        }
+        catch (Exception ex)
+        {
+            return 0;
+        }
+    }
+
+    public int lastId()
+    {
+        try
+        {
+            var values = getCursos();
+            Curso temp = new Curso();
+
+            while (!values.isEmpty())
+            {
+                temp = values.remove();
+            }
+
+            return temp.getCodCurso();
+        }
+        catch (Exception ex)
+        {
+            return 0;
+        }
+    }
 }

@@ -1,0 +1,109 @@
+package view;
+
+import controller.professor.ProfessorController;
+
+import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+
+public class ProfessorView extends JFrame {
+
+	private static final long serialVersionUID = 1L;
+	private ProfessorController professorController;
+	private JPanel contentPane;
+	private JTable tableProfessor;
+	private JScrollPane tableProfessorScroll;
+	private JTabbedPane tabbedPane;
+	private JPanel professorTab;
+	private JButton btnListarProfessores;
+	private JLabel labelMessage;
+	private JPanel disciplinaTab;
+
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					ProfessorView frame = new ProfessorView();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public ProfessorView() {
+		professorController = new ProfessorController();
+
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 939, 575);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setLayout(null);
+		setContentPane(contentPane);
+
+		professorTab = new JPanel();
+		professorTab.setLayout(null);
+
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.setBounds(46, 36, 824, 489);
+		tabbedPane.addTab("Professores", null, professorTab, null);
+		contentPane.add(tabbedPane);
+		
+		btnListarProfessores = new JButton("Listar Professores");
+		btnListarProfessores.setBounds(48, 11, 119, 35);
+
+		tableProfessorScroll = new JScrollPane();
+		tableProfessor = new JTable(new DefaultTableModel(new Object[][]{}, new ProfessorController().getFields()));
+
+		labelMessage = new JLabel();
+		labelMessage.setHorizontalAlignment(SwingConstants.CENTER);
+		labelMessage.setBounds(280, 415, 214, 35);
+
+		btnListarProfessores.addActionListener(e -> {
+            try
+            {
+				//Para remover os itens da tela
+				professorTab.remove(tableProfessor);
+				professorTab.remove(labelMessage);
+				professorTab.updateUI();
+
+                tableProfessorScroll = populateProfessores();
+                professorTab.add(tableProfessorScroll);
+            }
+            catch (Exception ex)
+            {
+				professorTab.remove(tableProfessor);
+				professorTab.remove(labelMessage);
+				professorTab.updateUI();
+
+				labelMessage.setText(ex.getMessage());
+				professorTab.add(labelMessage);
+				professorTab.updateUI();
+            }
+        });
+
+		professorTab.add(btnListarProfessores);
+		disciplinaTab = new JPanel();
+		tabbedPane.addTab("Disciplinas", null, disciplinaTab, null);
+	}
+
+	private JScrollPane populateProfessores() throws Exception
+	{
+		Object[][] data = professorController.get();
+
+		tableProfessor = new JTable(new DefaultTableModel(data, professorController.getFields()));
+		tableProfessor.setBounds(30, 57, 760, 361);
+
+		var painelProfessor = new JScrollPane(tableProfessor);
+		painelProfessor.setBounds(30, 57, 760, 361);
+		return painelProfessor;
+	}
+}

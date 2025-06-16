@@ -4,6 +4,7 @@ import model.dataStructures.Fila;
 import model.dataStructures.Lista;
 import model.inscricao.Inscricao;
 import model.inscricao.InscricaoModel;
+import model.quicksort.QuickSort;
 import model.utils.FileManager;
 
 public class ProfessorModel {
@@ -12,8 +13,16 @@ public class ProfessorModel {
 
     private Fila<Professor> getProfessores() throws Exception
     {
-        String[] values = this.manager.readFileToString().split(",");
+        String result = this.manager.readFileToString();
+
+        if (result.isBlank())
+        {
+            throw new Exception("Não há professores cadastrados");
+        }
+
+        String[] values = result.split(",");
         Fila<Professor> professores = new Fila<>();
+
 
         for (int x = 0; x < values.length; x += 4)
         {
@@ -33,6 +42,8 @@ public class ProfessorModel {
     public Object[][] populateTable() throws Exception
     {
         Fila<Professor> fila = getProfessores();
+        //QuickSort.quickSortFila(fila);
+
         int size = fila.size();
 
         Object[][] dados = new Object[size][4];
@@ -45,6 +56,23 @@ public class ProfessorModel {
             dados[x][1] = temp.getCpf();
             dados[x][2] = temp.getArea();
             dados[x][3] = temp.getPontos();
+        }
+
+        return dados;
+    }
+
+    public String[] getCpfProfessores() throws Exception
+    {
+        Fila<Professor> fila = getProfessores();
+        int size = fila.size();
+
+        String[] dados = new String[size];
+
+        for (int x = 0; x < size; x++)
+        {
+            Professor temp = fila.remove();
+
+            dados[x] = temp.getCpf();
         }
 
         return dados;
@@ -98,7 +126,7 @@ public class ProfessorModel {
     }
 
     //region Usar listas encadeadas no PUT e DELETE
-    public void putProfessor(Professor professor) throws Exception
+    public void putProfessor(Professor professor, String cpf) throws Exception
     {
         Fila<Professor> filaProfessores = getProfessores();
         Lista<Professor> professores = new Lista<>();
@@ -112,7 +140,7 @@ public class ProfessorModel {
         {
             Professor temp = (Professor)professores.get(x).dado;
 
-            if (temp.getCpf().equals(professor.getCpf()))
+            if (temp.getCpf().equals(cpf))
             {
                 professores.add(professor, x);
                 professores.remove(x + 1);
@@ -125,13 +153,13 @@ public class ProfessorModel {
         //Transformar em string para o csv
         for (int x = 0; x < professores.size(); x++)
         {
-            str.append(professores.get(x).dado.toString().replaceAll("(L>)|([|])|\\n", ",").trim());
+            str.append(professores.get(x).dado.toString().trim());
         }
 
         this.manager.writeIntoFile(str.toString(), false);
     }
 
-    public void deleteProfessor(Professor professor) throws Exception
+    public void deleteProfessor(String cpf) throws Exception
     {
         Fila<Professor> filaProfessores = getProfessores();
         Lista<Professor> professores = new Lista<>();
@@ -145,7 +173,7 @@ public class ProfessorModel {
         {
             Professor temp = (Professor)professores.get(x).dado;
 
-            if (temp.getCpf().equals(professor.getCpf()))
+            if (temp.getCpf().equals(cpf))
             {
                 professores.remove(x);
                 break;
@@ -155,9 +183,17 @@ public class ProfessorModel {
         StringBuffer str = new StringBuffer();
 
         //Transformar em string para o csv
-        for (int x = 0; x < professores.size(); x++)
+        if (!professores.isEmpty())
         {
-            str.append(professores.get(x).dado.toString().replaceAll("(L>)|([|])|\\n", ",").trim());
+            for (int x = 0; x < professores.size(); x++)
+            {
+                str.append(professores.get(x).dado.toString().trim());
+
+                if (professores.get(x).proximo == null)
+                {
+                    break;
+                };
+            }
         }
 
         this.manager.writeIntoFile(str.toString(), false);

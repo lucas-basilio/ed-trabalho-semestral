@@ -33,17 +33,17 @@ public class ProfessorController implements ActionListener {
 
     public void post(Professor professor) throws Exception
     {
-        this.professorModel.postProfessor(professor.toCSV());
+        this.professorModel.postProfessor(professor.toString());
     }
 
-    public void put(Professor professor) throws Exception
+    public void put(Professor professor, String cpf) throws Exception
     {
-        this.professorModel.putProfessor(professor);
+        this.professorModel.putProfessor(professor, cpf);
     }
 
-    public void delete(Professor professor) throws Exception
+    public void delete(String cpf) throws Exception
     {
-        this.professorModel.deleteProfessor(professor);
+        this.professorModel.deleteProfessor(cpf);
     }
 
     @Override

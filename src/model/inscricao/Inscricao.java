@@ -4,15 +4,10 @@ import model.utils.StreamableObject;
 
 public class Inscricao extends StreamableObject
 {
+    private int codInscricao;
     private int codProcesso;
     private String cpfProfessor;
     private int codDisciplina;
-    private boolean ativo;
-
-    public Inscricao()
-    {
-        this.ativo = true;
-    }
 
     //region Getters Setters
 
@@ -46,12 +41,12 @@ public class Inscricao extends StreamableObject
         this.codDisciplina = codDisciplina;
     }
 
-    public boolean isAtivo() {
-        return ativo;
+    public int getCodInscricao() {
+        return codInscricao;
     }
 
-    public void setAtivo(boolean ativo) {
-        this.ativo = ativo;
+    public void setCodInscricao(int codInscricao) {
+        this.codInscricao = codInscricao;
     }
 
     //endregion

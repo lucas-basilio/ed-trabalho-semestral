@@ -1,19 +1,29 @@
 package model.disciplina;
 
+import model.curso.Curso;
+import model.curso.CursoModel;
 import model.dataStructures.Fila;
 import model.dataStructures.Lista;
+import model.inscricao.Inscricao;
 import model.inscricao.InscricaoModel;
-import model.professor.Professor;
+import model.processo.ProcessoModel;
 import model.utils.FileManager;
 
-public class DisciplinaModel {
-
+public class DisciplinaModel{
     private final FileManager manager = new FileManager("src/data/disciplinas.csv");
+    private final CursoModel cursoModel = new CursoModel();
 
-    private Fila<Disciplina> getDisciplinas() throws Exception
+    public Fila<Disciplina> getDisciplinas() throws Exception
     {
-        String[] values = this.manager.readFileToString().split(",");
         Fila<Disciplina> disciplinas = new Fila<>();
+        String result = this.manager.readFileToString();
+
+        if (result.isBlank())
+        {
+            throw new Exception("Não há disciplinas cadastradas");
+        }
+
+        String[] values = result.split(",");
 
         for (int x = 0; x < values.length; x += 6)
         {
@@ -30,6 +40,61 @@ public class DisciplinaModel {
         }
 
         return disciplinas;
+    }
+
+    public String[] getFields()
+    {
+        return new Disciplina().properties();
+    }
+
+    public Integer[] getCodCursos() throws Exception
+    {
+        return cursoModel.getCodCursos();
+    }
+
+    public Integer[] getCodDisciplinas(int[] exclude) throws Exception
+    {
+        Fila<Disciplina> disciplinas = getDisciplinas();
+        Fila<Integer> filteredItems = new Fila<>();
+        int size = disciplinas.size();
+
+        for (int x = 0; x < size; x++)
+        {
+            boolean contains = false;
+            Disciplina temp = disciplinas.remove();
+
+            //Deixar o exclude opcional
+            if (exclude != null)
+            {
+                for (int y = 0; y < exclude.length; y++)
+                {
+                    if (exclude[y] == temp.getCodDisciplina())
+                    {
+                        contains = true;
+                    }
+                }
+            }
+
+            if (!contains)
+            {
+                filteredItems.insert(temp.getCodDisciplina());
+            }
+        }
+
+        //Tudo isso pq não pode usar primitivo
+        if (filteredItems.isEmpty())
+        {
+            throw new Exception("Não há disciplinas disponíveis pois todas possuem processo ativo");
+        }
+
+        Integer[] values = new Integer[filteredItems.size()];
+
+        for (int x = 0; x < values.length; x++)
+        {
+            values[x] = filteredItems.remove();
+        }
+
+        return values;
     }
 
     public Object[][] populateTable() throws Exception
@@ -110,7 +175,7 @@ public class DisciplinaModel {
         this.manager.writeIntoFile(str.toString(), false);
     }
 
-    public void deleteDisciplina (Disciplina disciplina) throws Exception
+    public void deleteDisciplina (int cod) throws Exception
     {
         InscricaoModel inscricaoModel = new InscricaoModel();
 
@@ -125,11 +190,19 @@ public class DisciplinaModel {
         for (int x = 0; x < disciplinas.size(); x++)
         {
             Disciplina temp = (Disciplina)disciplinas.get(x).dado;
+            ProcessoModel processoModel = new ProcessoModel();
 
-            if (temp.getCodDisciplina() == disciplina.getCodDisciplina())
+            if (temp.getCodDisciplina() == cod)
             {
                 //Remove as inscrições associadas àquela disciplina
-                inscricaoModel.deleteInscricao(inscricaoModel.getInscricaoByDisciplina(temp.getCodDisciplina()));
+                try
+                {
+                   processoModel.deleteProcesso(processoModel.getProcessoByDisciplina(cod).getCodProcesso());
+                }
+                catch (Exception ex)
+                {
+
+                }
                 disciplinas.remove(x);
             }
         }
@@ -145,4 +218,37 @@ public class DisciplinaModel {
         this.manager.writeIntoFile(str.toString(), false);
     }
     //endregion
+
+    public int count()
+    {
+        try
+        {
+            var values = getDisciplinas();
+            return values.size();
+        }
+        catch (Exception ex)
+        {
+            return 0;
+        }
+    }
+
+    public int lastId()
+    {
+        try
+        {
+            var values = getDisciplinas();
+            Disciplina temp = new Disciplina();
+
+            while (!values.isEmpty())
+            {
+                temp = values.remove();
+            }
+
+            return temp.getCodDisciplina();
+        }
+        catch (Exception ex)
+        {
+            return 0;
+        }
+    }
 }
